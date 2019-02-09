@@ -22,5 +22,30 @@ connection.query("SELECT * FROM bamazon.products", function(err, res) {
   }
     if (err) throw err;
     console.log(table.toString());
-    connection.end();
+    userPrompt()
   });
+  
+  
+  
+  var userPrompt = function() {
+    inquirer.prompt([
+    {
+      type: 'input',
+      name: 'id',
+      message: "Please, enter the ID of desired product",
+    },
+    {
+      type: 'input',
+      name: 'qty',
+      message: "Please, enter quantity of product you want to buy",
+    }
+  ]).then(function(response) {
+    connection.query("SELECT * FROM bamazon.products WHERE id=?",[response.id], function(err, res) {
+      if (err) throw err;
+      price = parseFloat(res[0].price)
+      quantity = parseInt(response.qty)
+      console.log('Your total is: $'+(price*quantity));
+      connection.end();
+    });
+  })
+}
