@@ -42,10 +42,27 @@ connection.query("SELECT * FROM bamazon.products", function(err, res) {
   ]).then(function(response) {
     connection.query("SELECT * FROM bamazon.products WHERE id=?",[response.id], function(err, res) {
       if (err) throw err;
-      price = parseFloat(res[0].price)
-      quantity = parseInt(response.qty)
-      console.log('Your total is: $'+(price*quantity));
-      connection.end();
+      if (res[0].stock_quantity<response.qty){console.log('Insufficient quantity!')}
+      else {
+        price = parseFloat(res[0].price)
+        quantity = parseInt(response.qty)
+        total = (price*quantity).toFixed(2)
+        console.log("You've purchased "+response.qty+' of '+res[0].product_name+'\n'+
+                    'Your total is: $'+total+'\n'+
+                    'Thank you! Please, come again!');
+        connection.query("UPDATE bamazon.products SET ? WHERE ?",
+          [
+            {
+              stock_quantity: (res[0].stock_quantity-response.qty)
+            },
+            {
+              id: res[0].id
+            }
+          ],
+          )
+        connection.end()
+      }
     });
   })
 }
+
