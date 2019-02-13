@@ -122,4 +122,39 @@ function addInv() {
         restockUserPrompt()
 })
 }
-function newProd() {}
+function newProd() {
+    connection.query("SELECT * FROM bamazon.products", function(err, res) {
+        var categories = [];
+        for(i=0;i<res.length;i++){
+            categories.push(res[i].department_name)
+        }
+        categories = categories.filter(function(elem, pos) {
+            return categories.indexOf(elem) == pos;
+        })
+        inquirer.prompt([
+        {
+        type: 'list',
+        name: 'department',
+        message: "\nPlease, enter the category of new item\n",
+        choices: categories
+        },
+        {
+        type: 'input',
+        name: 'itemName',
+        message: "\nPlease, enter the name of new item\n"
+        },
+        {
+        type: 'input',
+        name: 'department',
+        message: "\nPlease, enter the quantity of new item you have in stock\n"
+        },
+        {
+        type: 'input',
+        name: 'department',
+        message: "\nPlease, enter new item's price\n"
+        }
+    ]).then(function() {
+        console.log('hey')
+    })
+})
+}
