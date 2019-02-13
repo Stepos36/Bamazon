@@ -14,7 +14,7 @@ var userPrompt = function() {
     {
       type: 'list',
       name: 'userChoice',
-      message: "Welcome to Bamazon manager menu!",
+      message: "\nWelcome to Bamazon manager menu!\n",
       choices: [    "View Products for Sale",
                     "View Low Inventory",
                     "Add to Inventory",
@@ -70,5 +70,56 @@ function lowInventory() {
           console.log(table.toString());
         });
 }
-function addInv() {}
+function addInv() {
+    connection.query("SELECT * FROM bamazon.products", function(err, res) {
+        var itemChoices = [];
+        for(i=0;i<res.length;i++){
+            itemChoices.push(res[i].product_name)
+            itemChoices.push(new inquirer.Separator())
+        }
+        if (err) throw err;
+        var restockUserPrompt = function(){
+            inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'chooseItem',
+                    message: "\nPlease, choose an item you would like to restock\n",
+                    choices: itemChoices
+                },
+                {
+                    type: 'input',
+                    name: 'itemAmount',
+                    message: "\nPlease, enter the amount of item you would like to restock\n"
+                }
+            ]).then(function(response) {
+                if ((response.itemAmount==null)||(response.itemAmount=='')){
+                    console.log(`\nPlease, enter a proper amount\n`);
+                    restockUserPrompt()
+                }
+                else {
+                    var itemName = response.chooseItem
+                    var stock
+                    var managerAdd
+                    connection.query("SELECT * FROM bamazon.products WHERE product_name = ?",response.chooseItem, function(err, res) {
+                        stock = res[0].stock_quantity
+                        managerAdd = response.itemAmount
+                        var newAmount = parseInt(stock)+parseInt(managerAdd)
+                        connection.query("UPDATE bamazon.products SET ? WHERE ? ",
+                        [
+                            {
+                                stock_quantity: newAmount
+                            },
+                            {
+                                product_name: response.chooseItem 
+                            }    
+                        ], function(err, res) {
+                            console.log(`\nUpdate succesful!\nYou have added ${managerAdd} of ${itemName} to the stock\n`)
+                        })
+                });
+                }
+            });   
+        }
+        restockUserPrompt()
+})
+}
 function newProd() {}
