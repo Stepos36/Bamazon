@@ -53,6 +53,23 @@ function forSale() {
         }
           if (err) throw err;
           console.log(table.toString());
+          inquirer.prompt([
+            {
+                type: 'list',
+                name: 'menu',
+                message:"\nWhat would you like to do next?\n",
+                choices: [  "Back to main menu",
+                            "Quit program"
+                        ]
+            }
+            ]).then(function(response){
+                if (response.menu === "Back to main menu") {
+                    userPrompt()
+                }
+                else if (response.menu  === "Quit program") {
+                    connection.end()
+                }
+            });
         });
 }
 function lowInventory() {
@@ -67,7 +84,24 @@ function lowInventory() {
           );
         }
           if (err) throw err;
-          console.log(table.toString());
+          console.log(table.toString())
+          inquirer.prompt([
+                        {
+                            type: 'list',
+                            name: 'menu',
+                            message:"\nWhat would you like to do next?\n",
+                            choices: [  "Back to main menu",
+                                        "Quit program"
+                                    ]
+                        }
+                        ]).then(function(response){
+                            if (response.menu === "Back to main menu") {
+                                userPrompt()
+                            }
+                            else if (response.menu  === "Quit program") {
+                                connection.end()
+                            }
+                        });
         });
 }
 function addInv() {
@@ -114,6 +148,27 @@ function addInv() {
                             }    
                         ], function(err, res) {
                             console.log(`\nUpdate succesful!\nYou have added ${managerAdd} of ${itemName} to the stock\n`)
+                            inquirer.prompt([
+                                {
+                                    type: 'list',
+                                    name: 'menu',
+                                    message:"\nWhat would you like to do next?\n",
+                                    choices: [  "Restock another item",
+                                                "Back to main menu",
+                                                "Quit program"
+                                            ]
+                                }
+                            ]).then(function(response){
+                                if(response.menu === "Restock another item") {
+                                    addInv()
+                                }
+                                else if (response.menu === "Back to main menu") {
+                                    userPrompt()
+                                }
+                                else if (response.menu  === "Quit program") {
+                                    connection.end()
+                                }
+                            })
                         })
                 });
                 }
@@ -171,7 +226,30 @@ function newProd() {
                           price: resp.price,
                           stock_quantity: resp.quantity
                         },
-                        function(err, ress) {console.log('New item added')}
+                        function(err, ress) {
+                            console.log('New item added')
+                            inquirer.prompt([
+                                {
+                                    type: 'list',
+                                    name: 'menu',
+                                    message:"\nWhat would you like to do next?\n",
+                                    choices: [  "Add another item",
+                                                "Back to main menu",
+                                                "Quit program"
+                                            ]
+                                }
+                            ]).then(function(response){
+                                if(response.menu === "Add another item") {
+                                    newProd()
+                                }
+                                else if (response.menu === "Back to main menu") {
+                                    userPrompt()
+                                }
+                                else if (response.menu  === "Quit program") {
+                                    connection.end()
+                                }
+                            })
+                        }
                     )
                 })
             }
@@ -200,9 +278,32 @@ function newProd() {
                           price: resp.price,
                           stock_quantity: resp.quantity
                         },
-                        function(err, ress) {console.log('New item added')}
+                        function(err, ress) {
+                            console.log('\nNew item added\n')
+                            inquirer.prompt([
+                                {
+                                    type: 'list',
+                                    name: 'menu',
+                                    message:"\nWhat would you like to do next?\n",
+                                    choices: [  "Add another item",
+                                                "Back to main menu",
+                                                "Quit program"
+                                            ]
+                                }
+                            ]).then(function(response){
+                                if(response.menu === "Add another item") {
+                                    newProd()
+                                }
+                                else if (response.menu === "Back to main menu") {
+                                    userPrompt()
+                                }
+                                else if (response.menu  === "Quit program") {
+                                    connection.end()
+                                }
+                            })
+                        })
+                    }
                     )
-                })
         }
     })
 })
