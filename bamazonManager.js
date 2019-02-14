@@ -131,6 +131,7 @@ function newProd() {
         categories = categories.filter(function(elem, pos) {
             return categories.indexOf(elem) == pos;
         })
+        categories.push('>>Add new category')
         inquirer.prompt([
         {
         type: 'list',
@@ -138,23 +139,71 @@ function newProd() {
         message: "\nPlease, enter the category of new item\n",
         choices: categories
         },
-        {
-        type: 'input',
-        name: 'itemName',
-        message: "\nPlease, enter the name of new item\n"
-        },
-        {
-        type: 'input',
-        name: 'department',
-        message: "\nPlease, enter the quantity of new item you have in stock\n"
-        },
-        {
-        type: 'input',
-        name: 'department',
-        message: "\nPlease, enter new item's price\n"
+    ]).then(function(response) {
+        var cat = response.department
+        if(response.department ==='>>Add new category') {
+            inquirer.prompt([
+                {
+                    type: 'input',
+                    name: 'newDept',
+                    message: "\nPlease, enter the name of new department"
+                },
+                {
+                    type: 'input',
+                    name: 'itemName',
+                    message: "\nPlease, enter the name of new item\n"
+                },
+                {
+                    type: 'input',
+                    name: 'quantity',
+                    message: "\nPlease, enter the quantity of new item you have in stock\n"
+                },
+                {
+                    type: 'input',
+                    name: 'price',
+                    message: "\nPlease, enter new item's price\n"
+                }
+                ]).then(function(resp) {
+                    connection.query("INSERT INTO bamazon.products SET ?",
+                        {
+                          product_name: resp.itemName,
+                          department_name: resp.newDept,
+                          price: resp.price,
+                          stock_quantity: resp.quantity
+                        },
+                        function(err, ress) {console.log('New item added')}
+                    )
+                })
+            }
+        else {
+            inquirer.prompt([
+                {
+                    type: 'input',
+                    name: 'itemName',
+                    message: "\nPlease, enter the name of new item\n"
+                },
+                {
+                    type: 'input',
+                    name: 'quantity',
+                    message: "\nPlease, enter the quantity of new item you have in stock\n"
+                },
+                {
+                    type: 'input',
+                    name: 'price',
+                    message: "\nPlease, enter new item's price\n"
+                }
+                ]).then(function(resp) {
+                    connection.query("INSERT INTO bamazon.products SET ?",
+                        {
+                          product_name: resp.itemName,
+                          department_name: cat,
+                          price: resp.price,
+                          stock_quantity: resp.quantity
+                        },
+                        function(err, ress) {console.log('New item added')}
+                    )
+                })
         }
-    ]).then(function() {
-        console.log('hey')
     })
 })
 }
