@@ -18,7 +18,8 @@ var userPrompt = function() {
       choices: [    "View Products for Sale",
                     "View Low Inventory",
                     "Add to Inventory",
-                    "Add New Product"
+                    "Add New Product",
+                    "Quit program"
                 ]
     },
   ]).then(function(response) {
@@ -35,6 +36,9 @@ var userPrompt = function() {
           case "Add New Product":
           newProd()
           break
+          case "Quit program":
+          connection.end()
+          break
       }
   });
 }
@@ -44,32 +48,16 @@ function forSale() {
     connection.query("SELECT * FROM bamazon.products", function(err, res) {
         var table = new Table({
           head: ['id', 'product', 'department', 'price', 'quantity']
-        , colWidths: [4, 50, 14, 8, 8]
+        , colWidths: [7, 50, 14, 14, 14]
         });
-        for(i=0;i<res.length;i++){
+        for(var i=0;i<res.length;i++){
           table.push(
-            [res[i].id, res[i].product_name, res[i].department_name, res[i].price, res[i].stock_quantity]
+            [res[i].id, res[i].product_name, res[i].department_name,'$'+ res[i].price, res[i].stock_quantity]
           );
         }
           if (err) throw err;
           console.log(table.toString());
-          inquirer.prompt([
-            {
-                type: 'list',
-                name: 'menu',
-                message:"\nWhat would you like to do next?\n",
-                choices: [  "Back to main menu",
-                            "Quit program"
-                        ]
-            }
-            ]).then(function(response){
-                if (response.menu === "Back to main menu") {
-                    userPrompt()
-                }
-                else if (response.menu  === "Quit program") {
-                    connection.end()
-                }
-            });
+          whatsNextView()
         });
 }
 function lowInventory() {
@@ -78,36 +66,20 @@ function lowInventory() {
           head: ['id', 'product', 'department', 'price', 'quantity']
         , colWidths: [4, 50, 14, 8, 8]
         });
-        for(i=0;i<res.length;i++){
+        for(var i=0;i<res.length;i++){
           table.push(
             [res[i].id, res[i].product_name, res[i].department_name, res[i].price, res[i].stock_quantity]
           );
         }
           if (err) throw err;
           console.log(table.toString())
-          inquirer.prompt([
-                        {
-                            type: 'list',
-                            name: 'menu',
-                            message:"\nWhat would you like to do next?\n",
-                            choices: [  "Back to main menu",
-                                        "Quit program"
-                                    ]
-                        }
-                        ]).then(function(response){
-                            if (response.menu === "Back to main menu") {
-                                userPrompt()
-                            }
-                            else if (response.menu  === "Quit program") {
-                                connection.end()
-                            }
-                        });
+          whatsNextView()
         });
 }
 function addInv() {
     connection.query("SELECT * FROM bamazon.products", function(err, res) {
         var itemChoices = [];
-        for(i=0;i<res.length;i++){
+        for(var i=0;i<res.length;i++){
             itemChoices.push(res[i].product_name)
             itemChoices.push(new inquirer.Separator())
         }
@@ -180,7 +152,7 @@ function addInv() {
 function newProd() {
     connection.query("SELECT * FROM bamazon.products", function(err, res) {
         var categories = [];
-        for(i=0;i<res.length;i++){
+        for(var i=0;i<res.length;i++){
             categories.push(res[i].department_name)
         }
         categories = categories.filter(function(elem, pos) {
@@ -227,28 +199,8 @@ function newProd() {
                           stock_quantity: resp.quantity
                         },
                         function(err, ress) {
-                            console.log('New item added')
-                            inquirer.prompt([
-                                {
-                                    type: 'list',
-                                    name: 'menu',
-                                    message:"\nWhat would you like to do next?\n",
-                                    choices: [  "Add another item",
-                                                "Back to main menu",
-                                                "Quit program"
-                                            ]
-                                }
-                            ]).then(function(response){
-                                if(response.menu === "Add another item") {
-                                    newProd()
-                                }
-                                else if (response.menu === "Back to main menu") {
-                                    userPrompt()
-                                }
-                                else if (response.menu  === "Quit program") {
-                                    connection.end()
-                                }
-                            })
+                            console.log(`${resp.quantity} of ${resp.itemName} added to ${resp.newDept} department. ($${resp.price})`)
+                            whatsNextNew()
                         }
                     )
                 })
@@ -279,32 +231,55 @@ function newProd() {
                           stock_quantity: resp.quantity
                         },
                         function(err, ress) {
-                            console.log('\nNew item added\n')
-                            inquirer.prompt([
-                                {
-                                    type: 'list',
-                                    name: 'menu',
-                                    message:"\nWhat would you like to do next?\n",
-                                    choices: [  "Add another item",
-                                                "Back to main menu",
-                                                "Quit program"
-                                            ]
-                                }
-                            ]).then(function(response){
-                                if(response.menu === "Add another item") {
-                                    newProd()
-                                }
-                                else if (response.menu === "Back to main menu") {
-                                    userPrompt()
-                                }
-                                else if (response.menu  === "Quit program") {
-                                    connection.end()
-                                }
-                            })
+                            console.log(`${resp.quantity} of ${resp.itemName} added to ${resp.newDept} department. ($${resp.price})`)
+                            whatsNextNew()
                         })
                     }
                     )
         }
     })
 })
+}
+
+var whatsNextView = function() {
+    inquirer.prompt([
+        {
+            type: 'list',
+            name: 'menu',
+            message:"\nWhat would you like to do next?\n",
+            choices: [  "Back to main menu",
+                        "Quit program"
+                    ]
+        }
+    ]).then(function(response){
+        if (response.menu === "Back to main menu") {
+            userPrompt()
+        }
+        else if (response.menu  === "Quit program") {
+            connection.end()
+        }
+    })
+}
+var whatsNextNew = function() {
+    inquirer.prompt([
+        {
+            type: 'list',
+            name: 'menu',
+            message:"\nWhat would you like to do next?\n",
+            choices: [  "Add another item",
+                        "Back to main menu",
+                        "Quit program"
+                    ]
+        }
+    ]).then(function(response){
+        if(response.menu === "Add another item") {
+            newProd()
+        }
+        else if (response.menu === "Back to main menu") {
+            userPrompt()
+        }
+        else if (response.menu  === "Quit program") {
+            connection.end()
+        }
+    })
 }
