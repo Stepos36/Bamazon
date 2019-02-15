@@ -1,10 +1,10 @@
-#Bamazon CLI store
-###Bamazon is an Amazon-like SQL based app that has 2 possible user interfaces: Bamazon customer and Bamazon manager
+# Bamazon CLI store
+### Bamazon is an Amazon-like SQL based app that has 2 possible user interfaces: Bamazon customer and Bamazon manager
 
-####Bamazon customer allows user to view items available in the store and shop available items
-####Bamazon manager allows user to manage this store: view items, view low inventory, restock items and add new items to the store
+#### Bamazon customer allows user to view items available in the store and shop available items
+#### Bamazon manager allows user to manage this store: view items, view low inventory, restock items and add new items to the store
 
-##_Bamazon customer_
+## _Bamazon customer_
 Bamazon customer allows user to view items available in the store and buy them
 
 * **Purchasing process** 
@@ -16,7 +16,7 @@ User-friendly interface will help user easily perform all the necessary action i
 
 ![Bamazon Customer](assets/readme/customer.gif)
 
-##_Bamazon manager_
+## _Bamazon manager_
 Bamazon manager allows user to view items available in the store, view items that the store is low on, restock items and add new ones
 
 * **View Products for Sale**
